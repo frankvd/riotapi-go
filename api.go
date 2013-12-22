@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ApiKey    string
-	Region    string
+	parser    = new(JsonParser)
+	apiKey    string
+	region    string
 	baseUrl   = "http://prod.api.pvp.net"
 	endpoints = map[string]string{
 		"champion":         "/api/lol/{region}/v1.1/champion",
@@ -26,27 +27,28 @@ var (
 	}
 )
 
-func SetApiKey(key string) {
-	ApiKey = key
+func SetApiKey(k string) {
+	apiKey = k
 }
-func SetRegion(region string) {
-	Region = region
+func SetRegion(r string) {
+	region = r
+}
+func SetParser(p Parser) {
+	parser = p
 }
 
 func Call(endpoint string, params ...string) interface{} {
 	resp, _ := http.Get(createUrl(endpoint, params))
 	body, _ := ioutil.ReadAll(resp.Body)
-	var json interface{}
-	json.Unmarshal(body, &json)
 
-	return json
+	return parser.Parse(resp)
 }
 
 func createUrl(endpoint string, params []string) string {
 	resourceUrl := endpoints[endpoint]
-	resourceUrl = strings.Replace(resourceUrl, "{region}", Region, 1)
+	resourceUrl = strings.Replace(resourceUrl, "{region}", region, 1)
 	for _, value := range params {
 		resourceUrl = strings.Replace(resourceUrl, "{param}", value, 1)
 	}
-	return baseUrl + resourceUrl + "?api_key=" + ApiKey
+	return baseUrl + resourceUrl + "?api_key=" + apiKey
 }
