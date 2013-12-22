@@ -36,10 +36,10 @@ func SetRegion(region string) {
 func Call(endpoint string, params ...string) interface{} {
 	resp, _ := http.Get(createUrl(endpoint, params))
 	body, _ := ioutil.ReadAll(resp.Body)
-	var summoner interface{}
-	json.Unmarshal(body, &summoner)
+	var json interface{}
+	json.Unmarshal(body, &json)
 
-	return summoner
+	return json
 }
 
 func createUrl(endpoint string, params []string) string {
