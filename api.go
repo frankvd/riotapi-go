@@ -2,6 +2,7 @@ package riotapi
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -43,6 +44,14 @@ func SummonerByName(name string) Summoner {
 	parser.Parse(resp.Body, &summoner)
 
 	return summoner[name]
+}
+
+func SummonerMasteries(id int) interface{} {
+	resp := Call("masteries", strconv.Itoa(id))
+	masteries := map[string]Masteries{}
+	parser.Parse(resp.Body, &masteries)
+
+	return masteries
 }
 
 func Call(endpoint string, params ...string) *http.Response {
