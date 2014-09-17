@@ -2,7 +2,7 @@ package riotapi
 
 type MasteryPage struct {
 	Masteries []map[string]int
-	ID        int
+	Id        int
 	Name      string
 	Current   bool
 }

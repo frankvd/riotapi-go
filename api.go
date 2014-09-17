@@ -46,12 +46,22 @@ func SummonerByName(name string) Summoner {
 	return summoner[name]
 }
 
-func SummonerMasteries(id int) interface{} {
-	resp := Call("masteries", strconv.Itoa(id))
+func SummonerMasteries(id int) Masteries {
+	textId := strconv.Itoa(id)
+	resp := Call("masteries", textId)
 	masteries := map[string]Masteries{}
 	parser.Parse(resp.Body, &masteries)
 
-	return masteries
+	return masteries[textId]
+}
+
+func SummonerRunes(id int) Runes {
+	textId := strconv.Itoa(id)
+	resp := Call("runes", textId)
+	runes := map[string]Runes{}
+	parser.Parse(resp.Body, &runes)
+
+	return runes[textId]
 }
 
 func Call(endpoint string, params ...string) *http.Response {
