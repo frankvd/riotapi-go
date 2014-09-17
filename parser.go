@@ -2,6 +2,7 @@ package riotapi
 
 import (
 	"encoding/json"
+	"io"
 )
 
 type Parser interface {
@@ -11,9 +12,6 @@ type Parser interface {
 type JsonParser struct {
 }
 
-func (j *JsonParser) Parse(response string) {
-	var json interface{}
-	json.Unmarshal(response, &json)
-
-	return json
+func (j *JsonParser) Parse(response io.ReadCloser, ret interface{}) {
+	json.NewDecoder(response).Decode(ret)
 }
