@@ -2,81 +2,89 @@ package riotapi
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 )
 
-var (
-	parser    = new(JsonParser)
-	apiKey    string
-	region    string
-	baseUrl   = "http://euw.api.pvp.net"
-	endpoints = map[string]string{
-		"champion":         "/api/lol/{region}/v1.1/champion",
-		"recent-games":     "/api/lol/{region}/v1.1/game/by-summoner/{param}/recent",
-		"league":           "/api/lol/{region}/v2.2/league/by-summoner/{param}",
-		"summary":          "/api/lol/{region}/v1.2/stats/by-summoner/{param}/summary",
-		"ranked-stats":     "/api/lol/{region}/v1.2/stats/by-summoner/{param}/ranked",
-		"masteries":        "/api/lol/{region}/v1.4/summoner/{param}/masteries",
-		"runes":            "/api/lol/{region}/v1.4/summoner/{param}/runes",
-		"summoner-by-name": "/api/lol/{region}/v1.4/summoner/by-name/{param}",
-		"summoner-by-id":   "/api/lol/{region}/v1.4/summoner/{param}",
-		"summoner-names":   "/api/lol/{region}/v1.4/summoner/{param}/name",
-		"team":             "/api/lol/{region}/v2.2/team/by-summoner/{param}",
-		"match-history":    "/api/lol/{region}/v2.2/matchhistory/{param}",
-		"match":            "/api/lol/{region}/v2.2/match/{param}",
+type Service struct {
+	Parser Parser
+	Client *Client
+}
+
+type Api struct {
+	Champion     ChampionService
+	Game         GameService
+	League       LeagueService
+	StaticData   StaticDataService
+	Status       StatusService
+	Match        MatchService
+	MatchHistory MatchHistoryService
+	Stats        StatsService
+	Summoner     SummonerService
+	Team         TeamService
+}
+
+func NewApi(apikey string) *Api {
+	client := NewClient()
+	client.ApiKey = apikey
+	parser := new(JsonParser)
+
+	api := Api{
+		Champion:     ChampionService{Service: &Service{Client: client, Parser: parser}},
+		League:       LeagueService{Service: &Service{Client: client, Parser: parser}},
+		Summoner:     SummonerService{Service: &Service{Client: client, Parser: parser}},
+		MatchHistory: MatchHistoryService{Service: &Service{Client: client, Parser: parser}},
 	}
-)
 
-func SetApiKey(k string) {
-	apiKey = k
-}
-func SetRegion(r string) {
-	region = r
-}
-func SetParser(p *JsonParser) {
-	parser = p
+	return &api
 }
 
-func SummonerByName(name string) Summoner {
-	resp := Call("summoner-by-name", name)
-	summoner := map[string]Summoner{}
-	parser.Parse(resp.Body, &summoner)
-
-	return summoner[name]
+type Client struct {
+	Endpoints map[string]string
+	ApiKey    string
+	Region    string
+	BaseUrl   string
 }
 
-func SummonerMasteries(id int) Masteries {
-	textId := strconv.Itoa(id)
-	resp := Call("masteries", textId)
-	masteries := map[string]Masteries{}
-	parser.Parse(resp.Body, &masteries)
+func NewClient() *Client {
+	client := Client{
+		BaseUrl: "http://euw.api.pvp.net",
+		ApiKey:  "apikey",
+		Region:  "euw",
+		Endpoints: map[string]string{
+			"champion":         "/api/lol/{region}/v1.2/champion",
+			"champion-by-id":   "/api/lol/{region}/v1.2/champion/{param}",
+			"recent-games":     "/api/lol/{region}/v1.1/game/by-summoner/{param}/recent",
+			"league":           "/api/lol/{region}/v2.5/league/by-summoner/{param}",
+			"summary":          "/api/lol/{region}/v1.2/stats/by-summoner/{param}/summary",
+			"ranked-stats":     "/api/lol/{region}/v1.2/stats/by-summoner/{param}/ranked",
+			"masteries":        "/api/lol/{region}/v1.4/summoner/{param}/masteries",
+			"runes":            "/api/lol/{region}/v1.4/summoner/{param}/runes",
+			"summoner-by-name": "/api/lol/{region}/v1.4/summoner/by-name/{param}",
+			"summoner-by-id":   "/api/lol/{region}/v1.4/summoner/{param}",
+			"summoner-names":   "/api/lol/{region}/v1.4/summoner/{param}/name",
+			"team":             "/api/lol/{region}/v2.2/team/by-summoner/{param}",
+			"match-history":    "/api/lol/{region}/v2.2/matchhistory/{param}",
+			"match":            "/api/lol/{region}/v2.2/match/{param}",
+		},
+	}
 
-	return masteries[textId]
+	return &client
 }
 
-func SummonerRunes(id int) Runes {
-	textId := strconv.Itoa(id)
-	resp := Call("runes", textId)
-	runes := map[string]Runes{}
-	parser.Parse(resp.Body, &runes)
-
-	return runes[textId]
-}
-
-func Call(endpoint string, params ...string) *http.Response {
-	resp, err := http.Get(createUrl(endpoint, params))
+func (client *Client) Call(endpoint string, params ...string) *http.Response {
+	url := client.createUrl(endpoint, params)
+	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
 	}
 	return resp
 }
 
-func createUrl(endpoint string, params []string) string {
-	resourceUrl := endpoints[endpoint]
-	resourceUrl = strings.Replace(resourceUrl, "{region}", region, 1)
+func (client *Client) createUrl(endpoint string, params []string) string {
+	resourceUrl := client.Endpoints[endpoint]
+	resourceUrl = strings.Replace(resourceUrl, "{region}", client.Region, 1)
 	for _, value := range params {
 		resourceUrl = strings.Replace(resourceUrl, "{param}", value, 1)
 	}
-	return baseUrl + resourceUrl + "?api_key=" + apiKey
+	return client.BaseUrl + resourceUrl + "?api_key=" + client.ApiKey
 }

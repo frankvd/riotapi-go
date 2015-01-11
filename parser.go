@@ -6,7 +6,7 @@ import (
 )
 
 type Parser interface {
-	Parse(response string) interface{}
+	Parse(response io.ReadCloser, ret interface{})
 }
 
 type JsonParser struct {
