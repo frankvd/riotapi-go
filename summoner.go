@@ -2,10 +2,12 @@ package riotapi
 
 import "strconv"
 
+// Summoner service
 type SummonerService struct {
 	*Service
 }
 
+// Summoner
 type Summoner struct {
 	Name          string `json:name`
 	ID            int
@@ -14,6 +16,7 @@ type Summoner struct {
 	RevisionDate  int
 }
 
+// Find a summoner by his/her name
 func (service *SummonerService) ByName(name string) Summoner {
 	resp := service.Client.Call("summoner-by-name", name)
 
@@ -23,6 +26,7 @@ func (service *SummonerService) ByName(name string) Summoner {
 	return summoner[name]
 }
 
+// Returns the masteries of the summoner
 func (service *SummonerService) Masteries(id int) Masteries {
 	textId := strconv.Itoa(id)
 	resp := service.Client.Call("masteries", textId)
@@ -32,7 +36,8 @@ func (service *SummonerService) Masteries(id int) Masteries {
 	return masteries[textId]
 }
 
-func (service *SummonerService) SummonerRunes(id int) Runes {
+// Returns the runes of the summoner
+func (service *SummonerService) Runes(id int) Runes {
 	textId := strconv.Itoa(id)
 	resp := service.Client.Call("runes", textId)
 	runes := map[string]Runes{}

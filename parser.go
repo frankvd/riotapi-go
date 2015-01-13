@@ -5,13 +5,16 @@ import (
 	"io"
 )
 
+// Parser interface
 type Parser interface {
-	Parse(response io.ReadCloser, ret interface{})
+	Parse(response io.Reader, ret interface{})
 }
 
+// JSON parser
 type JsonParser struct {
 }
 
-func (j *JsonParser) Parse(response io.ReadCloser, ret interface{}) {
+// Parse the json into the object
+func (j *JsonParser) Parse(response io.Reader, ret interface{}) {
 	json.NewDecoder(response).Decode(ret)
 }

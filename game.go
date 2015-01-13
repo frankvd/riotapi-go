@@ -1,5 +1,6 @@
 package riotapi
 
+// Game service
 type GameService struct {
 	*Service
 }

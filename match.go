@@ -4,13 +4,17 @@ import (
 	"strconv"
 )
 
+// Match history service
 type MatchHistoryService struct {
 	*Service
 }
+
+// Match service
 type MatchService struct {
 	*Service
 }
 
+// Returns the match history of the summoner
 func (service *MatchHistoryService) ForSummoner(id int) MatchHistory {
 	textId := strconv.Itoa(id)
 	resp := service.Client.Call("match-history", textId)
@@ -20,10 +24,12 @@ func (service *MatchHistoryService) ForSummoner(id int) MatchHistory {
 	return history
 }
 
+// MatchHistory
 type MatchHistory struct {
 	Matches []Match
 }
 
+// Match
 type Match struct {
 	MapId                 int
 	MatchCreation         int
@@ -40,6 +46,7 @@ type Match struct {
 	Season                string
 }
 
+// Participant
 type Participant struct {
 	ChampionId                int
 	HighestAchievedSeasonTier string
@@ -53,11 +60,13 @@ type Participant struct {
 	Timeline                  ParticipantTimeline
 }
 
+// Participant identity
 type ParticipantIdentity struct {
 	ParticipantId int
 	Player        Player
 }
 
+// Participant stats
 type ParticipantStats struct {
 	Assists                         int
 	ChampLevel                      int
@@ -124,6 +133,7 @@ type ParticipantStats struct {
 	Winner                          bool
 }
 
+// Participant timeline
 type ParticipantTimeline struct {
 	AncientGolemAssistsPerMinCounts ParticipantTimelineData
 	AncientGolemKillsPerMinCounts   ParticipantTimelineData
@@ -154,6 +164,7 @@ type ParticipantTimeline struct {
 	XpPerMinDeltas                  ParticipantTimelineData
 }
 
+// Participant timeline data
 type ParticipantTimelineData struct {
 	ZeroToTen      float32
 	TenToTwenty    float32
@@ -161,6 +172,7 @@ type ParticipantTimelineData struct {
 	ThirtyToEnd    float32
 }
 
+// Player
 type Player struct {
 	MatchHistoryUri string
 	ProfileIcon     int

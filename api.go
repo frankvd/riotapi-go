@@ -5,11 +5,13 @@ import (
 	"strings"
 )
 
+// Service struct which is embedded in all services
 type Service struct {
 	Parser Parser
-	Client *Client
+	Client Client
 }
 
+// Struct which groups all services
 type Api struct {
 	Champion     ChampionService
 	Game         GameService
@@ -23,6 +25,7 @@ type Api struct {
 	Team         TeamService
 }
 
+// Initialize all services
 func NewApi(apikey string) *Api {
 	client := NewClient()
 	client.ApiKey = apikey
@@ -38,15 +41,21 @@ func NewApi(apikey string) *Api {
 	return &api
 }
 
-type Client struct {
+type Client interface {
+	Call(endpoint string, params ...string) *http.Response
+}
+
+// Http client
+type HttpClient struct {
 	Endpoints map[string]string
 	ApiKey    string
 	Region    string
 	BaseUrl   string
 }
 
-func NewClient() *Client {
-	client := Client{
+// Initialize a new client
+func NewClient() *HttpClient {
+	client := HttpClient{
 		BaseUrl: "http://euw.api.pvp.net",
 		ApiKey:  "apikey",
 		Region:  "euw",
@@ -71,7 +80,8 @@ func NewClient() *Client {
 	return &client
 }
 
-func (client *Client) Call(endpoint string, params ...string) *http.Response {
+// Call an API endpoint
+func (client *HttpClient) Call(endpoint string, params ...string) *http.Response {
 	url := client.createUrl(endpoint, params)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -80,7 +90,8 @@ func (client *Client) Call(endpoint string, params ...string) *http.Response {
 	return resp
 }
 
-func (client *Client) createUrl(endpoint string, params []string) string {
+// Compose an URL
+func (client *HttpClient) createUrl(endpoint string, params []string) string {
 	resourceUrl := client.Endpoints[endpoint]
 	resourceUrl = strings.Replace(resourceUrl, "{region}", client.Region, 1)
 	for _, value := range params {

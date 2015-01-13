@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// League object
 type League struct {
 	Entries       []LeagueEntry
 	Name          string
@@ -13,6 +14,7 @@ type League struct {
 	Tier          string
 }
 
+// League entry
 type LeagueEntry struct {
 	Division         string
 	IsFreshBlood     bool
@@ -31,6 +33,7 @@ type LeagueEntry struct {
 	}
 }
 
+// Sort type
 type ByLeaguePoints []LeagueEntry
 
 func (entries ByLeaguePoints) Len() int      { return len(entries) }
@@ -39,10 +42,12 @@ func (entries ByLeaguePoints) Less(i, j int) bool {
 	return entries[i].LeaguePoints > entries[j].LeaguePoints
 }
 
+// League service
 type LeagueService struct {
 	*Service
 }
 
+// Returns the league of the summoner
 func (service *LeagueService) ForSummoner(id int) League {
 	stringid := strconv.Itoa(id)
 	resp := service.Client.Call("league", stringid)
