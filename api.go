@@ -60,8 +60,8 @@ func NewClient() *HttpClient {
 		ApiKey:  "apikey",
 		Region:  "euw",
 		Endpoints: map[string]string{
-			"champion":         "/api/lol/{region}/v1.2/champion",
-			"champion-by-id":   "/api/lol/{region}/v1.2/champion/{param}",
+			"champions":        "/api/lol/{region}/v1.2/champion",
+			"champion":         "/api/lol/{region}/v1.2/champion/{param}",
 			"recent-games":     "/api/lol/{region}/v1.1/game/by-summoner/{param}/recent",
 			"league":           "/api/lol/{region}/v2.5/league/by-summoner/{param}",
 			"summary":          "/api/lol/{region}/v1.2/stats/by-summoner/{param}/summary",

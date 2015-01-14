@@ -1,5 +1,9 @@
 package riotapi
 
+import (
+	"strconv"
+)
+
 // Champion service
 type ChampionService struct {
 	*Service
@@ -17,9 +21,19 @@ type Champion struct {
 
 // Returns all champions
 func (service *ChampionService) All() []Champion {
-	resp := service.Client.Call("champion")
+	resp := service.Client.Call("champions")
 
 	var champions map[string][]Champion
 	service.Parser.Parse(resp.Body, &champions)
 	return champions["champions"]
+}
+
+// Returns a single champion
+func (service *ChampionService) One(id int) Champion {
+	resp := service.Client.Call("champion", strconv.Itoa(id))
+
+	var champion Champion
+	service.Parser.Parse(resp.Body, &champion)
+
+	return champion
 }
