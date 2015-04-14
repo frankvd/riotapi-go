@@ -1,6 +1,7 @@
 package riotapi
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -22,6 +23,16 @@ func (service *MatchHistoryService) ForSummoner(id int) MatchHistory {
 	service.Parser.Parse(resp.Body, &history)
 
 	return history
+}
+
+func (service *MatchService) Get(id int) Match {
+	textId := strconv.Itoa(id)
+	fmt.Printf("%s", textId)
+	resp := service.Client.Call("match", textId)
+	match := Match{}
+	service.Parser.Parse(resp.Body, &match)
+
+	return match
 }
 
 // MatchHistory

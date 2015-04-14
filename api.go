@@ -1,6 +1,7 @@
 package riotapi
 
 import (
+	"log"
 	"net/http"
 	"strings"
 )
@@ -36,6 +37,7 @@ func NewApi(apikey string) *Api {
 		League:       LeagueService{Service: &Service{Client: client, Parser: parser}},
 		Summoner:     SummonerService{Service: &Service{Client: client, Parser: parser}},
 		MatchHistory: MatchHistoryService{Service: &Service{Client: client, Parser: parser}},
+		Match:        MatchService{Service: &Service{Client: client, Parser: parser}},
 	}
 
 	return &api
@@ -56,7 +58,7 @@ type HttpClient struct {
 // Initialize a new client
 func NewClient() *HttpClient {
 	client := HttpClient{
-		BaseUrl: "http://euw.api.pvp.net",
+		BaseUrl: "https://euw.api.pvp.net",
 		ApiKey:  "apikey",
 		Region:  "euw",
 		Endpoints: map[string]string{
@@ -83,6 +85,7 @@ func NewClient() *HttpClient {
 // Call an API endpoint
 func (client *HttpClient) Call(endpoint string, params ...string) *http.Response {
 	url := client.createUrl(endpoint, params)
+	log.Printf("Calling: %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
