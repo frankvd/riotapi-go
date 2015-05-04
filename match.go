@@ -2,6 +2,7 @@ package riotapi
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 )
 
@@ -18,17 +19,21 @@ type MatchService struct {
 // Returns the match history of the summoner
 func (service *MatchHistoryService) ForSummoner(id int) MatchHistory {
 	textId := strconv.Itoa(id)
-	resp := service.Client.Call("match-history", textId)
+	resp := service.Client.Call("match-history", []string{textId}, nil)
 	history := MatchHistory{}
 	service.Parser.Parse(resp.Body, &history)
 
 	return history
 }
 
-func (service *MatchService) Get(id int) Match {
+func (service *MatchService) Get(id int, timeline bool) Match {
 	textId := strconv.Itoa(id)
 	fmt.Printf("%s", textId)
-	resp := service.Client.Call("match", textId)
+	query := url.Values{}
+	if timeline {
+		query.Add("includeTimeline", "true")
+	}
+	resp := service.Client.Call("match", []string{textId}, query)
 	match := Match{}
 	service.Parser.Parse(resp.Body, &match)
 
@@ -55,6 +60,7 @@ type Match struct {
 	QueueType             string
 	Region                string
 	Season                string
+	Timeline              MatchTimeline
 }
 
 // Participant
@@ -189,4 +195,57 @@ type Player struct {
 	ProfileIcon     int
 	SummonerId      int
 	SummonerName    string
+}
+
+type MatchTimeline struct {
+	FrameInterval int
+	Frames        []Frame
+}
+
+type Frame struct {
+	Events            []Event
+	ParticipantFrames map[string]ParticipantFrame
+	Timestamp         int
+}
+
+type Event struct {
+	AscendedType            string
+	AssistingParticipantIds []int
+	BuildingType            string
+	CreatorId               int
+	EventType               string
+	ItemAfter               int
+	ItemBefore              int
+	ItemId                  int
+	KillerId                int
+	LaneType                string
+	LevelUpType             string
+	MonsterType             string
+	ParticipantId           int
+	PointCaptured           string
+	Position                Position
+	SkillSlot               int
+	TeamId                  int
+	Timestamp               int
+	TowerType               string
+	VictimId                int
+	WardType                string
+}
+
+type Position struct {
+	X int
+	Y int
+}
+
+type ParticipantFrame struct {
+	CurrentGold         int
+	DominionScore       int
+	JungleMinionsKilled int
+	Level               int
+	MinionsKilled       int
+	ParticipantId       int
+	Position            Position
+	TeamScore           int
+	TotalGold           int
+	Xp                  int
 }

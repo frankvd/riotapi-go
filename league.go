@@ -50,7 +50,7 @@ type LeagueService struct {
 // Returns the league of the summoner
 func (service *LeagueService) ForSummoner(id int) League {
 	stringid := strconv.Itoa(id)
-	resp := service.Client.Call("league", stringid)
+	resp := service.Client.Call("league", []string{stringid}, nil)
 
 	leagues := map[string][]League{}
 	service.Parser.Parse(resp.Body, &leagues)

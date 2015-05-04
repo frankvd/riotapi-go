@@ -1,8 +1,10 @@
 package riotapi
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -24,6 +26,7 @@ type Api struct {
 	Stats        StatsService
 	Summoner     SummonerService
 	Team         TeamService
+	Client       Client
 }
 
 // Initialize all services
@@ -38,13 +41,15 @@ func NewApi(apikey string) *Api {
 		Summoner:     SummonerService{Service: &Service{Client: client, Parser: parser}},
 		MatchHistory: MatchHistoryService{Service: &Service{Client: client, Parser: parser}},
 		Match:        MatchService{Service: &Service{Client: client, Parser: parser}},
+		Client:       client,
 	}
 
 	return &api
 }
 
 type Client interface {
-	Call(endpoint string, params ...string) *http.Response
+	Call(endpoint string, params []string, query url.Values) *http.Response
+	SetRegion(region string)
 }
 
 // Http client
@@ -58,7 +63,7 @@ type HttpClient struct {
 // Initialize a new client
 func NewClient() *HttpClient {
 	client := HttpClient{
-		BaseUrl: "https://euw.api.pvp.net",
+		BaseUrl: "https://%s.api.pvp.net",
 		ApiKey:  "apikey",
 		Region:  "euw",
 		Endpoints: map[string]string{
@@ -82,9 +87,22 @@ func NewClient() *HttpClient {
 	return &client
 }
 
+func (client *HttpClient) SetRegion(region string) {
+	client.Region = region
+}
+
 // Call an API endpoint
-func (client *HttpClient) Call(endpoint string, params ...string) *http.Response {
-	url := client.createUrl(endpoint, params)
+func (client *HttpClient) Call(endpoint string, params []string, query url.Values) *http.Response {
+	if params == nil {
+		params = []string{}
+	}
+	if query == nil {
+		query = url.Values{}
+	}
+
+	query.Add("api_key", client.ApiKey)
+
+	url := client.createUrl(endpoint, params, query)
 	log.Printf("Calling: %s", url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -94,11 +112,11 @@ func (client *HttpClient) Call(endpoint string, params ...string) *http.Response
 }
 
 // Compose an URL
-func (client *HttpClient) createUrl(endpoint string, params []string) string {
+func (client *HttpClient) createUrl(endpoint string, params []string, query url.Values) string {
 	resourceUrl := client.Endpoints[endpoint]
 	resourceUrl = strings.Replace(resourceUrl, "{region}", client.Region, 1)
 	for _, value := range params {
 		resourceUrl = strings.Replace(resourceUrl, "{param}", value, 1)
 	}
-	return client.BaseUrl + resourceUrl + "?api_key=" + client.ApiKey
+	return fmt.Sprintf(client.BaseUrl, client.Region) + resourceUrl + "?" + query.Encode()
 }

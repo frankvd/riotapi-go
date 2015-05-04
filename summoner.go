@@ -18,7 +18,7 @@ type Summoner struct {
 
 // Find a summoner by his/her name
 func (service *SummonerService) ByName(name string) Summoner {
-	resp := service.Client.Call("summoner-by-name", name)
+	resp := service.Client.Call("summoner-by-name", []string{name}, nil)
 
 	summoner := map[string]Summoner{}
 	service.Parser.Parse(resp.Body, &summoner)
@@ -29,7 +29,7 @@ func (service *SummonerService) ByName(name string) Summoner {
 // Returns the masteries of the summoner
 func (service *SummonerService) Masteries(id int) Masteries {
 	textId := strconv.Itoa(id)
-	resp := service.Client.Call("masteries", textId)
+	resp := service.Client.Call("masteries", []string{textId}, nil)
 	masteries := map[string]Masteries{}
 	service.Parser.Parse(resp.Body, &masteries)
 
@@ -39,7 +39,7 @@ func (service *SummonerService) Masteries(id int) Masteries {
 // Returns the runes of the summoner
 func (service *SummonerService) Runes(id int) Runes {
 	textId := strconv.Itoa(id)
-	resp := service.Client.Call("runes", textId)
+	resp := service.Client.Call("runes", []string{textId}, nil)
 	runes := map[string]Runes{}
 	service.Parser.Parse(resp.Body, &runes)
 

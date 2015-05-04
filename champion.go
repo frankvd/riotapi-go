@@ -21,7 +21,7 @@ type Champion struct {
 
 // Returns all champions
 func (service *ChampionService) All() []Champion {
-	resp := service.Client.Call("champions")
+	resp := service.Client.Call("champions", nil, nil)
 
 	var champions map[string][]Champion
 	service.Parser.Parse(resp.Body, &champions)
@@ -30,7 +30,7 @@ func (service *ChampionService) All() []Champion {
 
 // Returns a single champion
 func (service *ChampionService) One(id int) Champion {
-	resp := service.Client.Call("champion", strconv.Itoa(id))
+	resp := service.Client.Call("champion", []string{strconv.Itoa(id)}, nil)
 
 	var champion Champion
 	service.Parser.Parse(resp.Body, &champion)
