@@ -60,7 +60,30 @@ type Match struct {
 	QueueType             string
 	Region                string
 	Season                string
+	Teams                 []Team
 	Timeline              MatchTimeline
+}
+
+type Team struct {
+	Bans                 []BannedChampion
+	BaronKills           int
+	DominionVictoryScore int
+	DragonKills          int
+	FirstBaron           bool
+	FirstBlood           bool
+	FirstDragon          bool
+	FirstInhibitor       bool
+	FirstTower           bool
+	InhibitorKills       int
+	TeamId               int
+	TowerKills           int
+	VilemawKills         int
+	Winner               bool
+}
+
+type BannedChampion struct {
+	ChampionId int
+	PickTurn   int
 }
 
 // Participant
