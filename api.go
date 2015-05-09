@@ -1,7 +1,6 @@
 package riotapi
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -63,7 +62,7 @@ type HttpClient struct {
 // Initialize a new client
 func NewClient() *HttpClient {
 	client := HttpClient{
-		BaseUrl: "https://%s.api.pvp.net",
+		BaseUrl: "https://{region}.api.pvp.net",
 		ApiKey:  "apikey",
 		Region:  "euw",
 		Endpoints: map[string]string{
@@ -118,5 +117,5 @@ func (client *HttpClient) createUrl(endpoint string, params []string, query url.
 	for _, value := range params {
 		resourceUrl = strings.Replace(resourceUrl, "{param}", value, 1)
 	}
-	return fmt.Sprintf(client.BaseUrl, client.Region) + resourceUrl + "?" + query.Encode()
+	return strings.Replace(client.BaseUrl, "{region}", client.Region, 1) + resourceUrl + "?" + query.Encode()
 }

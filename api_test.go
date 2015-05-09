@@ -20,10 +20,11 @@ func TestClientCall(t *testing.T) {
 		fmt.Fprint(w, r.URL.RequestURI())
 	}))
 	client := NewClient()
+	client.SetRegion("region")
 	client.BaseUrl = server.URL
 	client.Endpoints["test"] = "/{param}"
 
-	resp := client.Call("test", "test_param")
+	resp := client.Call("test", []string{"test_param"}, nil)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
@@ -38,6 +39,6 @@ func TestClientCall(t *testing.T) {
 			t.Error("Call should panic on http err")
 		}
 	}()
-	client.Call("test")
+	client.Call("test", nil, nil)
 
 }
